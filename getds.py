@@ -242,7 +242,7 @@ for index in range(len(videos)):
     outputName = "%s/%s - %i - %s.mov" % (outDir, prefix, index + 1, stories[index])
     url = "%s/%s" % (baseurl, videos[index])
     print "Retrieve story '%s'" % stories[index]
-    #(filename, headers) = urllib.urlretrieve(url, outputName)
+    (filename, headers) = urllib.urlretrieve(url, outputName)
 
 if allOkay:
     print "All downloaded okay, marking done."
