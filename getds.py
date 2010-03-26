@@ -52,6 +52,7 @@ def shouldCheckNow():
             else:
                 print "%i minutes since last check, let's try again." % \
                         (gap.seconds / 60)
+                return True
     except IOError, e:
         print "Couldn't open file", LASTCHECKFILE, "- assuming clean run"
         return True
@@ -102,7 +103,6 @@ def getRss():
     rssurl = "http://www.deafstation.org/deafstationDev/getAllPC.do?latestNews=1&preferredClientId=4"
 
     doneOnce = False
-    print "Getting RSS"
     while 1:
         if os.path.exists(RSSFILE):
             f = open(RSSFILE)
@@ -116,12 +116,12 @@ def getRss():
             updateLastChecked()
             break
         elif doneOnce:
-            print "\tLooks like feed hasn't updated yet."
+            print "Looks like feed hasn't updated yet."
             # Hold off for a bit to avoid flooding the website.
             updateLastChecked()
             raise Exception
         else:
-            print "\tRetrieving new copy."
+            print "Retrieving new copy of RSS feed."
             urllib.urlretrieve(rssurl, RSSFILE)
             doneOnce = True
 
