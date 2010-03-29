@@ -86,10 +86,10 @@ def convertTitleToDate(title):
     while len(day) and day[-1] not in string.digits:
         day = day[:-1]
     datelumps[0] = day
-    date = "%s %s %s" % (datelumps[0], datelumps[1], datelumps[2])
+    date = string.join(datelumps)
     return date
 
-def isDateCurrent(feed):
+def isFeedCurrent(feed):
     date = convertTitleToDate(feed.entries[0].title)
     dt = datetime.strptime(date, "%d %b %Y")
     now = datetime.utcnow()
@@ -110,7 +110,7 @@ def getRss():
             f.close()
             feed = feedparser.parse(''.join(rss))
 
-        if os.path.exists(RSSFILE) and isDateCurrent(feed):
+        if os.path.exists(RSSFILE) and isFeedCurrent(feed):
             # Update this - if the local copy is current, we don't need 
             # to pull the RSS again.
             updateLastChecked()
@@ -221,6 +221,7 @@ if shouldCheckNow() == False:
     sys.exit(0)
 
 (rss, feed, cached) = getRss()
+# Slight hack here; want to make this nicer.
 if rss == None:
     sys.exit(0)
 prefix = makePrefix(feed)
