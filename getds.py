@@ -119,7 +119,9 @@ def getRss():
             print "Looks like feed hasn't updated yet."
             # Hold off for a bit to avoid flooding the website.
             updateLastChecked()
-            raise Exception
+            rss = None
+            feed = None
+            break
         else:
             print "Retrieving new copy of RSS feed."
             urllib.urlretrieve(rssurl, RSSFILE)
@@ -219,6 +221,8 @@ if shouldCheckNow() == False:
     sys.exit(0)
 
 (rss, feed, cached) = getRss()
+if rss == None:
+    sys.exit(0)
 prefix = makePrefix(feed)
 outDir = makeOutDir(feed.entries[0].title)
 if checkAlreadyDownloaded(outDir):
