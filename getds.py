@@ -86,6 +86,8 @@ def convertTitleToDate(title):
     while len(day) and day[-1] not in string.digits:
         day = day[:-1]
     datelumps[0] = day
+    # They stopped supplying the year, so we'll invent it.
+    datelumps.append("%i" % datetime.utcnow().year)
     date = string.join(datelumps)
     return date
 
@@ -93,7 +95,7 @@ def isFeedCurrent(feed):
     date = convertTitleToDate(feed.entries[0].title)
     dt = datetime.strptime(date, "%d %b %Y")
     now = datetime.utcnow()
-    if dt.day == now.day and dt.month == now.month and dt.year == now.year:
+    if dt.day == now.day and dt.month == now.month:
         return True
     else:
         return False
@@ -188,6 +190,7 @@ def makePrefix(feed):
     return prefix
 
 def makeOutDir(datestring):
+    datestring = "%s %i" % (datestring, datetime.utcnow().year)
     dir = string.replace(datestring, " ", "_")
     try:
         os.mkdir(dir)
@@ -239,6 +242,8 @@ stories = findStories(feed)
 # Check we have the same amount of items and videos
 if len(videos) != len(stories):
     print "We don't have the same number of stories and videos."
+    print len(videos), "videos", videos
+    print len(stories), "stories", stories
     raise Exception
 
 # For each video, build the output filename and get it
