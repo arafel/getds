@@ -239,7 +239,14 @@ stories = findStories(feed)
 # Check we have the same amount of items and videos
 if len(videos) != len(stories):
     print "We don't have the same number of stories and videos."
-    raise Exception
+    print "We have", len(stories), "stories and", len(videos), "videos."
+    print "Stories:\n\t%s" % string.join(stories, '\n\t')
+    print "Videos:\n\t%s" % string.join(videos, '\n\t')
+    print "Limiting retrieval."
+    if len(videos) > len(stories):
+        videos = videos[:len(stories)]
+    else:
+        stories = stories[:len(videos)]
 
 # For each video, build the output filename and get it
 allOkay = True
