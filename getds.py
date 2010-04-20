@@ -93,6 +93,8 @@ def isFeedCurrent(feed):
     date = convertTitleToDate(feed.entries[0].title)
     dt = datetime.strptime(date, "%d %b %Y")
     now = datetime.utcnow()
+    print "Comparing day %i/%i, month %i/%i, year %i/%i" % \
+        (dt.day, now.day, dt.month, now.month, dt.year, now.year)
     if dt.day == now.day and dt.month == now.month and dt.year == now.year:
         return True
     else:
@@ -119,6 +121,12 @@ def getRss():
             print "Looks like feed hasn't updated yet."
             # Hold off for a bit to avoid flooding the website.
             updateLastChecked()
+            rss = None
+            feed = None
+            break
+        elif not shouldCheckNow():
+            # Hold off for a bit to avoid flooding the website.
+            print "Checked too recently, not re-checking yet."
             rss = None
             feed = None
             break
@@ -216,10 +224,6 @@ def markAlreadyDownloaded(dir):
     f.close()
 
 # Main
-if shouldCheckNow() == False:
-    print "Not checking just yet. Maybe too soon after last check?"
-    sys.exit(0)
-
 (rss, feed, cached) = getRss()
 # Slight hack here; want to make this nicer.
 if rss == None:
