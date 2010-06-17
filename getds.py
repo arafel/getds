@@ -91,7 +91,7 @@ def convertTitleToDate(title):
 
 def isFeedCurrent(feed):
     date = convertTitleToDate(feed.entries[0].title)
-    dt = datetime.strptime(date, "%d %b %Y")
+    dt = datetime.strptime(date, "%d %B %Y")
     now = datetime.utcnow()
     print "Comparing day %i/%i, month %i/%i, year %i/%i" % \
         (dt.day, now.day, dt.month, now.month, dt.year, now.year)
@@ -175,8 +175,56 @@ def findVideos(feed, page):
             filename = tmp[1]
             # Check if this is the headline
             videos.append(filename)
+            print "Comparing", filename, "to headline file", headlineFile
             if filename == headlineFile:
                 break
+
+    # Do this so they actually go the right way around, 
+    # since we processed in reverse...
+    videos.reverse()
+    return videos
+
+def findVideos2(page, date):
+    # Assume date in dd-mm-yyyy format
+    pagelen = len(page)
+    videos = []
+    findingOurDate = True
+    findingNextDate = False
+
+    for i in range(pagelen - 1, 0, -1):
+        chunks = string.split(page[i])
+        if len(chunks) < 9:
+            continue
+
+        # Check it's a video
+        if chunks[2] != 'alt="[VID]"':
+            continue
+
+        # Check it's big enough. If it is, pop it on the list.
+        filesize = convertSize(chunks[-1])
+        if filesize > (5 * 1024 * 1024):
+            filedate = chunks[6]
+            print "File date", filedate
+
+            tmp = string.split(chunks[5], '"')
+            filename = tmp[1]
+            # Check if this is the headline
+            if findingOurDate and filedate == date:
+                print "Dates %s and %s match, starting collection" % (filedate, date)
+                findingOurDate = False
+                findingNextDate = True
+                print "Appending %s" % filename
+                videos.append(filename)
+            elif findingNextDate:
+                if filedate != date:
+                    print "We found the previous entry"
+                    break
+                else:
+                    print "Looking for next date, %s == %s, appending %s" % (filedate, date, filename)
+                    videos.append(filename)
+            else:
+                print "Boring, skipping filedate", filedate
+                print "findingNextDate %s findingOurDate %s" % (findingNextDate, findingOurDate)
 
     # Do this so they actually go the right way around, 
     # since we processed in reverse...
@@ -188,7 +236,7 @@ def makePrefix(feed):
     # Basic sanity check
     if e.title[:4] == "News":
         date = convertTitleToDate(e.title)
-        dt = datetime.strptime(date, "%d %b %Y")
+        dt = datetime.strptime(date, "%d %B %Y")
         prefix = dt.strftime("News %Y %m %d")
     else:
         raise Exception
@@ -230,14 +278,12 @@ if rss == None:
     sys.exit(0)
 prefix = makePrefix(feed)
 outDir = makeOutDir(feed.entries[0].title)
-if checkAlreadyDownloaded(outDir):
-    print "Already seem to have downloaded for this day."
-    sys.exit(0)
 
 # Right - we still need to do stuff, so here we go.
 baseurl = getBaseUrl(feed)
 page = getPage(baseurl, cached)
 videos = findVideos(feed, page)
+#videos = findVideos2(page, "14-May-2010")
 stories = findStories(feed)
 
 # Check we have the same amount of items and videos
@@ -251,6 +297,10 @@ if len(videos) != len(stories):
         videos = videos[:len(stories)]
     else:
         stories = stories[:len(videos)]
+
+if checkAlreadyDownloaded(outDir):
+    print "Already seem to have downloaded for this day."
+    sys.exit(0)
 
 # For each video, build the output filename and get it
 allOkay = True
