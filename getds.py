@@ -159,7 +159,7 @@ def findVideos(feed, page):
     (urlpath, headlineFile) = getHeadlineFile(feed)
     pagelen = len(page)
     videos = []
-    for i in range(pagelen - 1, pagelen - 30, -1):
+    for i in range(pagelen - 1, 0, -1):
         chunks = string.split(page[i])
         if len(chunks) < 9:
             continue
@@ -177,6 +177,7 @@ def findVideos(feed, page):
             videos.append(filename)
             print "Comparing", filename, "to headline file", headlineFile
             if filename == headlineFile:
+                print "It matches."
                 break
 
     # Do this so they actually go the right way around, 
