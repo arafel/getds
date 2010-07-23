@@ -3,3 +3,4 @@ News_*
 lastcheck.var
 ds.rss
 listing.html
+*.pyc
