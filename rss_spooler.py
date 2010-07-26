@@ -121,7 +121,7 @@ def update_last_updated():
 	return None
 
 def rss_spool_main():
-	feed_current = False
+	feed_is_current = False
 	tmpfile = "tmp.bin"
 	logging.info("Need to check feed?")
 	if need_to_check_rss():
@@ -149,14 +149,22 @@ def rss_spool_loop():
 	logging.info("Entering main loop.")
 	while 1:
 		logging.info("Calling main.")
+		print "Calling main."
 		feed_is_current = rss_spool_main()
-		logging.info("Main says feed is" + feed_is_current + "current.")
+
+		# TODO 
+		if feed_is_current:
+			logging.info("Main says feed is current.")
+		else:
+			logging.info("Main says feed is not current.")
+
 		sleep_time = calculate_sleep_time(feed_is_current)
 		logging.info("Sleeping for %i seconds." % sleep_time)
-        # Yes, this is evil, I should do it properly.
-        logging._handlers.items()[0][0].flush()
+		print "Sleeping for %i seconds." % sleep_time
+		# Yes, this is evil, I should do it properly.
+		logging._handlers.items()[0][0].flush()
 		time.sleep(sleep_time)
-
+	
 def start_daemon():
 	context = daemon.DaemonContext(
 			working_directory=workingdir,
