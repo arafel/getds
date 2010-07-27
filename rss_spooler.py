@@ -72,17 +72,23 @@ def get_rss(outfile):
 
 def calculate_sleep_time(have_updated):
 	tmptime = datetime.today()
-	sleep_days = 0
+	sleep_hours = 0
 	if have_updated or today_is_weekend():
-		logging.info("Sleeping until 9am next working day.")
+		logging.info("Sleeping until approx 9am next working day.")
 		day = tmptime.weekday() + 1
 		if day >= 5:
 			logging.info("Today must be Friday. Switching to Monday.")
-			sleep_days = 6 - tmptime.weekday()
+			sleep_hours = (6 - tmptime.weekday()) * 24
 			day = 0
 		else:
-			sleep_days = 1
-		return sleep_days * (24 * 60 * 60)
+			sleep_hours = 24
+		logging.debug("Sleep hours is %i" % sleep_hours)
+		logging.debug("Current time (hour) is %i" % tmptime.hour)
+		# sleep_hours now takes us to the specified day
+		# now adjust it to start at 9am
+		sleep_hours = sleep_hours - (tmptime.hour - 9)
+		logging.debug("sleep_hours is %i" % sleep_hours)
+		return sleep_hours * 60 * 60
 	else:
 		logging.info("Sleeping for an hour.")
 		return (60 * 60)
