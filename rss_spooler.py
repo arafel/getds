@@ -78,7 +78,7 @@ def calculate_sleep_time(have_updated):
 		day = tmptime.weekday() + 1
 		if day >= 5:
 			logging.info("Today must be Friday. Switching to Monday.")
-			sleep_hours = (6 - tmptime.weekday()) * 24
+			sleep_hours = (7 - tmptime.weekday()) * 24
 			day = 0
 		else:
 			sleep_hours = 24
