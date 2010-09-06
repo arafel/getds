@@ -79,6 +79,30 @@ def getPage(url, cached):
     f.close()
     return page
 
+# DS use some really random date stuff. Try to keep all the madness is one
+# place.
+def parseDate(str):
+	dt = None
+	# print "parseDate trying to deal with string '%s'" % str
+	try:
+		dt = datetime.strptime(str, "%d %B %Y")
+	except:
+		try:
+			dt = datetime.strptime(str, "%d %B %Y")
+		except:
+			# print "Nope, strptime not working. Pulling it apart..."
+			chunks = string.split(str)
+			# Normalise month
+			chunks[1] = chunks[1][:3]
+			str = string.join(chunks)
+			try:
+				dt = datetime.strptime(str, "%d %b %Y")
+			except:
+				# print "No, I give up. Can't do date."
+				pass
+	
+	return dt
+
 def convertTitleToDate(title):
     # Usually, Python's nice. This bit, much less so. Ew.
     datelumps = string.split(title[5:])
@@ -91,7 +115,11 @@ def convertTitleToDate(title):
 
 def isFeedCurrent(feed):
     date = convertTitleToDate(feed.entries[0].title)
-    dt = datetime.strptime(date, "%d %B %Y")
+    dt = parseDate(date)
+    if not dt:
+        print "Couldn't parse date."
+        return False
+
     now = datetime.utcnow()
     print "Comparing day %i/%i, month %i/%i, year %i/%i" % \
         (dt.day, now.day, dt.month, now.month, dt.year, now.year)
@@ -237,7 +265,7 @@ def makePrefix(feed):
     # Basic sanity check
     if e.title[:4] == "News":
         date = convertTitleToDate(e.title)
-        dt = datetime.strptime(date, "%d %B %Y")
+        dt = parseDate(date)
         prefix = dt.strftime("News %Y %m %d")
     else:
         raise Exception
