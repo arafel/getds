@@ -4,3 +4,6 @@ lastcheck.var
 ds.rss
 listing.html
 *.pyc
+rss_spool.log
+rss_spooler.dat
+stored_rss/

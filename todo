@@ -1,0 +1,22 @@
+    get_rss(tmpfile)
+  File "./rss_spooler.py", line 71, in get_rss
+    urllib.urlretrieve(RSSURL, outfile)
+  File "/usr/lib/python2.5/urllib.py", line 89, in urlretrieve
+    return _urlopener.retrieve(url, filename, reporthook, data)
+  File "/usr/lib/python2.5/urllib.py", line 222, in retrieve
+    fp = self.open(url, data)
+  File "/usr/lib/python2.5/urllib.py", line 190, in open
+    return getattr(self, name)(url)
+  File "/usr/lib/python2.5/urllib.py", line 328, in open_http
+    errcode, errmsg, headers = h.getreply()
+  File "/usr/lib/python2.5/httplib.py", line 1199, in getreply
+    response = self._conn.getresponse()
+  File "/usr/lib/python2.5/httplib.py", line 928, in getresponse
+    response.begin()
+  File "/usr/lib/python2.5/httplib.py", line 385, in begin
+    version, status, reason = self._read_status()
+  File "/usr/lib/python2.5/httplib.py", line 343, in _read_status
+    line = self.fp.readline()
+  File "/usr/lib/python2.5/socket.py", line 372, in readline
+    data = recv(1)
+IOError: [Errno socket error] (104, 'Connection reset by peer')
