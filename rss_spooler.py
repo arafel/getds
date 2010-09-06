@@ -50,6 +50,29 @@ def get_rss_date(title):
 	date = string.join(datelumps)
 	return date
 
+# DS use some really random date stuff. Try to keep all the madness is one
+# place.
+def parse_date(str):
+	dt = None
+	logging.debug("parse_date trying to deal with string '%s'" % str)
+	try:
+		dt = datetime.strptime(str, "%d %B %Y")
+	except:
+		try:
+			dt = datetime.strptime(str, "%d %B %Y")
+		except:
+			logging.debug("Nope, strptime not working. Pulling it apart...")
+			chunks = string.split(str)
+			# Normalise month
+			chunks[1] = chunks[1][:3]
+			str = string.join(chunks)
+			try:
+				dt = datetime.strptime(str, "%d %b %Y")
+			except:
+				logging.error("No, I give up. Can't do date.")
+	
+	return dt
+
 def rss_is_from_today(rss_file):
 	f = open(rss_file)
 	rss = f.readlines()
@@ -57,7 +80,12 @@ def rss_is_from_today(rss_file):
 	feed = feedparser.parse(''.join(rss))
 
 	date = get_rss_date(feed.entries[0].title)
-	dt = datetime.strptime(date, "%d %B %Y")
+	dt = parse_date(date)
+	if not dt:
+		logging.error("Couldn't parse date '%s'" % date)
+		print "Couldn't parse date '%s'" % date
+		return False
+
 	now = datetime.utcnow()
 	logging.debug("Comparing day %i/%i, month %i/%i, year %i/%i" % \
 		(dt.day, now.day, dt.month, now.month, dt.year, now.year))
