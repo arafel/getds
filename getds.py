@@ -186,31 +186,41 @@ def getBaseUrl(feed):
 def findVideos(feed, page):
     (urlpath, headlineFile) = getHeadlineFile(feed)
     pagelen = len(page)
-    videos = []
-    for i in range(pagelen - 1, 0, -1):
-        chunks = string.split(page[i])
-        if len(chunks) < 9:
-            continue
+    for thresh_loop in range(10, 3, -1):
+        videos = []
+        threshold = thresh_loop * (1024 * 1024)
+        #print "Checking for threshold %iM" % thresh_loop
 
-        # Check it's a video
-        if chunks[2] != 'alt="[VID]"':
-            continue
+        # It's unlikely to be 100 lines back...
+        for i in range(pagelen - 1, pagelen - 101, -1):
+            chunks = string.split(page[i])
+            if len(chunks) < 9:
+                continue
 
-        # Check it's big enough. If it is, pop it on the list.
-        filesize = convertSize(chunks[-1])
-        if filesize > (10 * 1024 * 1024):
-            tmp = string.split(chunks[5], '"')
-            filename = tmp[1]
-            # Check if this is the headline
-            videos.append(filename)
-            print "Comparing", filename, "to headline file", headlineFile
-            if filename == headlineFile:
-                print "It matches."
-                break
+            # Check it's a video
+            if chunks[2] != 'alt="[VID]"':
+                continue
+
+            # Check it's big enough. If it is, pop it on the list.
+            filesize = convertSize(chunks[-1])
+            if filesize > threshold:
+                tmp = string.split(chunks[5], '"')
+                filename = tmp[1]
+                # Check if this is the headline
+                videos.append(filename)
+                #print "Comparing", filename, "to headline file", headlineFile
+                if filename == headlineFile:
+                    print "It matches."
+                    break
+
+        if i != (pagelen - 100):
+            break
 
     # Do this so they actually go the right way around, 
     # since we processed in reverse...
-    videos.reverse()
+    if videos:
+        videos.reverse()
+
     return videos
 
 def findVideos2(page, date):
