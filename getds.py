@@ -344,7 +344,8 @@ if checkAlreadyDownloaded(outDir):
 # For each video, build the output filename and get it
 allOkay = True
 for index in range(len(videos)):
-    outputName = "%s/%s - %i - %s.mov" % (outDir, prefix, index + 1, stories[index])
+    escaped_story = string.replace(stories[index], os.sep, "_")
+    outputName = "%s/%s - %i - %s.mov" % (outDir, prefix, index + 1, escaped_story)
     url = "%s/%s" % (baseurl, videos[index])
     print "Retrieve story '%s'" % stories[index]
     (filename, headers) = urllib.urlretrieve(url, outputName)
